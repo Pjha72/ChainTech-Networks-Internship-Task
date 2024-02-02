@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { getAuth, updateProfile } from 'firebase/auth';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { collection, doc, query, updateDoc,getDocs, where, orderBy, deleteDoc} from 'firebase/firestore';
+import { doc, updateDoc} from 'firebase/firestore';
 import { db } from "../firebase"
-import {FcHome} from 'react-icons/fc'
-import ListingItem from '../components/ListingItem';
+
 
 export default function Profile() {
   const [changeDetails, setChangeDetails] = useState(false);
@@ -51,43 +50,7 @@ export default function Profile() {
       toast.error("Could not update the profile details")
     }
   }
-  useEffect(() => {
-    async function userFetchListing(){
-      // setLoading(true);
-      const listingRef = collection(db,"listings");
-      const q = query(listingRef, 
-        where("userRef", "==", auth.currentUser.uid), 
-        orderBy("timestamp","desc"));
-      const querySnap = await getDocs(q);
-      let listing = [];
-      querySnap.forEach((doc)=>{
-        return listing.push({
-          id : doc.id,
-          data:doc.data(),
-        });
-      });
-      setListing(listing);
-      setLoading(false);
-      
-    }
-    userFetchListing();
-  }, [auth.currentUser.uid])
-  
 
-  // Edit and Delete Functionality
-  async function onDelete(listingID){
-    if(window.confirm("Are you sure you want to delete!")){
-      await deleteDoc(doc(db,"listings", listingID))
-     const updatedListings = listing.filter(
-      (listings)=> listings.id !== listingID
-     );
-     setListing(updatedListings);
-     toast.success("Successfully deleted the listing!")
-    }
-  }
-  function onEdit(listingID){
-    navigate(`/edit-listing/${listingID}`)
-  }
   return (
     <>
       <section className='max-w-6xl mx-auto flex justify-center items-center flex-col'>
@@ -111,31 +74,9 @@ export default function Profile() {
               <p className='text-blue-600 hover:text-blue-800 transition ease-in-out duration-200 cursor-pointer' onClick={onLogout}>Sign Out</p>
             </div>
           </form>
-            <button type='submit' className='w-full bg-blue-600 text-white uppercase px-7 py-3 text-sm font-medium rounded shadow-md hover:bg-blue-700 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800'>
-            <Link to="/create-listing" className='flex justify-center items-center'>
-              <FcHome className='mr-2 text-3xl bg-red-200 rounded-full p-1 border-2'/>
-              Sell or rent your home
-            </Link>
-            </button>
+            
         </div>
       </section>
-
-      <div className='max-w-6xl px-3 mt-6 mx-auto'>
-        {!loading && listing != null && listing.length > 0 && (
-          <>
-            <h2 className='text-2xl text-center font-semibold mb-6'>My Listing</h2>
-
-            <ul className='sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 mt-6 mb-6'>
-              {listing.map((listing)=>(
-                <ListingItem  key={listing.id} id={listing.id} listing ={listing.data}
-                onDelete={() => onDelete(listing.id)}
-                onEdit={() => onEdit(listing.id)}
-                />
-              ))}
-            </ul>
-          </>
-        )}
-      </div>
     </>
   )
 }

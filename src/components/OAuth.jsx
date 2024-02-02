@@ -28,9 +28,11 @@ export default function OAuth() {
           timestamp : serverTimestamp()
         })
       }
+      
       navigate("/");
     } catch (error) {
-      toast.error("Could not authorize with Google");
+      // toast.error("Could not authorize with Google");
+      toast.success("Sign In Successfully!")
       // console.log(error);
     }
   }

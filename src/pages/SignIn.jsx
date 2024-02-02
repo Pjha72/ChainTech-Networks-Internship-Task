@@ -31,6 +31,7 @@ export default function SignIn() {
         console.log(userCredentials.user);
         
       }
+      toast.success("Sign In Successfully!")
       navigate("/");
       
       
